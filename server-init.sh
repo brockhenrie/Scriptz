@@ -24,8 +24,9 @@ then
   then 
     curl -sSL https://get.docker.com | bash
     sudo usermod -aG docker mantis
-    systemctl enable docker.service
-    systemctl start docker.service
+    sudo systemctl enable docker.service
+    sudo systemctl start docker.service
+    sudo apt install -y docker-compose
   fi
 fi
 
