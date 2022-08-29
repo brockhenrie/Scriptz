@@ -55,6 +55,15 @@ then
   sudo ufw allow 5514
 fi
 
+if [ ${HOSTNAME} = "rancher" ]
+then
+  echo "Adding Firewall Rules for ${HOSTNAME}"
+  sudo ufw allow 6443
+  sudo ufw allow 8472
+  sudo ufw allow 10250
+  sudo ufw allow 2376
+fi
+
 if [[ ${HOSTNAME} == "k3s-server-"* ]]
 then
   echo "Adding Firewall Rules for ${HOSTNAME}"
@@ -78,7 +87,7 @@ sudo ufw enable
 
 if [[ ${HOSTNAME} == "k3s-server-"* ]]
 then
-  curl -sfL https://get.k3s.io | sh -s - server  --disable servicelb --disable traefik --write-kubeconfig-mode 644 --kube-apiserver-arg default-not-ready-toleration-seconds=30 --kube-apiserver-arg default-unreachable-toleration-seconds=30 --kube-controller-arg node-monitor-period=20s --kube-controller-arg node-monitor-grace-period=20s --kubelet-arg node-status-update-frequency=5s 
+  curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.24.4+k3s1 sh -s - server  --disable servicelb --disable traefik --write-kubeconfig-mode 644 --kube-apiserver-arg default-not-ready-toleration-seconds=30 --kube-apiserver-arg default-unreachable-toleration-seconds=30 --kube-controller-arg node-monitor-period=20s --kube-controller-arg node-monitor-grace-period=20s --kubelet-arg node-status-update-frequency=5s  
 
   sudo cat /var/lib/rancher/k3s/server/node-token
   cp /etc/rancher/k3s/k3s.yaml ~/
@@ -93,6 +102,6 @@ then
   read -sp "Enter Password to get k3s-server node token" sshpassword
   k3s_token=$(sshpass -p ${sshpassword} ssh mantis@${k3s_ip} 'sudo cat /var/lib/rancher/k3s/server/node-token')
   
-  curl -sfL https://get.k3s.io | K3S_TOKEN=$k3s_token K3S_URL=$k3s_url sh -s - --kubelet-arg node-status-update-frequency=5s 
+  curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.24.4+k3s1 K3S_TOKEN=$k3s_token K3S_URL=$k3s_url sh -s - --kubelet-arg node-status-update-frequency=5s 
 fi
 
